@@ -225,6 +225,8 @@ define(function(require) {
 
         setupFeedback: function() {
 
+            var fb = this.model.get('_feedback');
+
             if (this.model.get('_isCorrect')) {
                 this.setupCorrectFeedback();
             } else if (this.isPartlyCorrect()) {
@@ -232,8 +234,13 @@ define(function(require) {
             } else {
                 // apply individual item feedback
                 if((this.model.get('_selectable') === 1) && this.model.get('_selectedItems')[0].feedback) {
-                    this.setupIndividualFeedback(this.model.get('_selectedItems')[0]);
-                    return;
+                    // if generic feedback has been provided use it when applicable
+                    if (fb && (this.model.get('_attemptsLeft') == 0 && fb._incorrect.final || this.model.get('_attemptsLeft') > 0 && fb._incorrect.notFinal)) {
+                        this.setupIncorrectFeedback();
+                    }
+                    else {
+                        this.setupIndividualFeedback(this.model.get('_selectedItems')[0]);
+                    }
                 } else {
                     this.setupIncorrectFeedback();
                 }
